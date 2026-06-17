@@ -1,0 +1,7 @@
+CREATE TABLE mcp_servers (
+id UUID PRIMARY KEY,
+user_id UUID NOT NULL REFERENCES users(id),
+name TEXT NOT NULL,
+status TEXT NOT NULL,
+created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
