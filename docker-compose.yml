@@ -9,6 +9,24 @@ services:
       - /app/node_modules
     depends_on:
       - db
+      - redis
+    environment:
+      DATABASE_URL: postgresql://postgres:password@db:5432/mcp_factory
+      REDIS_URL: redis://redis:6379
+
+  worker:
+    build:
+      context: ./backend
+    command: npm run worker
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      - db
+      - redis
+    environment:
+      DATABASE_URL: postgresql://postgres:password@db:5432/mcp_factory
+      REDIS_URL: redis://redis:6379
 
   db:
     image: postgres:16
@@ -18,3 +36,8 @@ services:
       POSTGRES_DB: mcp_factory
     ports:
       - "5433:5432"
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
