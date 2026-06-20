@@ -6,13 +6,22 @@ services:
       - "3000:3000"
     volumes:
       - ./backend:/app
-      - /app/node_modules
     depends_on:
       - db
       - redis
+      - minio
     environment:
       DATABASE_URL: postgresql://postgres:password@db:5432/mcp_factory
       REDIS_URL: redis://redis:6379
+      JWT_SECRET: 9d7e7c1b6f3a5e8d4c2f7a1b9e6d8c3f5a7b1e9d4c6f8a2b
+      JWT_REFRESH_SECRET: 5e9c1d7a3f8b2c6d4e1a9f7b3c5d8e2f6a1b4c7d9e3f8a5b
+      NODE_ENV: development
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin123
+      PUBLIC_MINIO_HOST: localhost
+      PUBLIC_MINIO_PORT: 9000
 
   worker:
     build:
@@ -20,13 +29,20 @@ services:
     command: npm run worker
     volumes:
       - ./backend:/app
-      - /app/node_modules
     depends_on:
       - db
       - redis
+      - minio
     environment:
       DATABASE_URL: postgresql://postgres:password@db:5432/mcp_factory
       REDIS_URL: redis://redis:6379
+      JWT_SECRET: 9d7e7c1b6f3a5e8d4c2f7a1b9e6d8c3f5a7b1e9d4c6f8a2b
+      JWT_REFRESH_SECRET: 5e9c1d7a3f8b2c6d4e1a9f7b3c5d8e2f6a1b4c7d9e3f8a5b
+      NODE_ENV: development
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin123
 
   db:
     image: postgres:16
@@ -41,3 +57,21 @@ services:
     image: redis:7-alpine
     ports:
       - "6379:6379"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  
+
+  minio:
+    image: minio/minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    volumes:
+      - minio_data:/data
+
+volumes:
+  postgres_data: 
+  minio_data: 

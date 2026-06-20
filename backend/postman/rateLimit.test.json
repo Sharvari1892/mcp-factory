@@ -1,0 +1,58 @@
+{
+  "info": {
+    "_postman_id": "8c227bf3-d2d0-4d56-b072-6a6829774640",
+    "name": "Rate Limiter Test Collection",
+    "description": "Verification of sliding window rate limiting on /health POST",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "POST Health Check",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.info.iteration < 100) {",
+              "    pm.test(\"Status code is 200 for first 100 requests\", function () {",
+              "        pm.response.to.have.status(200);",
+              "    });",
+              "} else {",
+              "    pm.test(\"Status code is 429 for request 101+\", function () {",
+              "        pm.response.to.have.status(429);",
+              "    });",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/health",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "health"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

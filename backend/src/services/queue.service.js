@@ -12,10 +12,11 @@ const generationQueue = new Queue("generation", {
 	connection: redisConnection
 });
 
-async function enqueueJob(serverId, specContent) {
+async function enqueueJob(serverId, specContent, jobId) {
 	return generationQueue.add("generate-server", {
 		serverId,
-		specContent
+		specContent,
+    jobId
 	});
 }
 

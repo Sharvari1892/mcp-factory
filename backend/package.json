@@ -23,8 +23,11 @@
     "ioredis": "^5.11.1",
     "js-yaml": "^4.2.0",
     "jsonwebtoken": "^9.0.3",
+    "minio": "^8.0.7",
+    "multer": "^2.2.0",
     "pg": "^8.21.0",
     "uuid": "^14.0.0",
+    "ws": "^8.21.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {

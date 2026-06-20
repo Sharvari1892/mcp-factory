@@ -8,6 +8,7 @@ const express = require("express");
 
 const pool = require("../db");
 const { enqueueJob } = require("../services/queue.service");
+const { getPresignedUrl } = require("../services/storage.service");
 
 const generateSchema = z.object({
     specId: z.uuid(),
@@ -102,6 +103,50 @@ router.get(
     }
 );
 
+router.get(
+    "/:id/download",
+    authMiddleware,
+
+    async (req, res, next) => {
+        try {
+            const result = await pool.query(
+                `
+                SELECT storage_key
+                FROM mcp_servers
+                WHERE id = $1
+                AND user_id = $2
+                `,
+                [req.params.id, req.userId]
+            );
+
+            if (result.rows.length === 0) {
+                const notFoundError = new Error("Server not found");
+                notFoundError.statusCode = 404;
+                return next(notFoundError);
+            }
+
+            const server = result.rows[0];
+            if (!server.storage_key) {
+                return res.status(400).json({
+                    error: "Server has not been generated yet"
+                });
+            }
+
+            const downloadUrl = await getPresignedUrl("servers", server.storage_key);
+
+            res.json({
+                downloadUrl,
+                message: "This link is valid for 15 minutes."
+            });
+        } catch (err) {
+            console.error("[download] Error generating presigned URL:", err.message);
+            const serverError = new Error("Internal server error");
+            serverError.statusCode = 500;
+            return next(serverError);
+        }
+    }
+);
+
 router.post(
     "/generate",
     authMiddleware,
@@ -179,7 +224,7 @@ router.post(
                 ]
             );
 
-            await enqueueJob(serverId, specContent);
+            await enqueueJob(serverId, specContent, jobId);
 
             res.status(201).json({
                 serverId,

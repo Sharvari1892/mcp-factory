@@ -18,7 +18,7 @@ const { z } = require("zod");
 const validateMiddleware = require("../middleware/validate.middleware");
 
 const registerSchema = z.object({
-    email: z.email(),
+    email: z.string().email(),
     password: z.string().min(6)
 });
 

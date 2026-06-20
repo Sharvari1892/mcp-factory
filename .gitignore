@@ -1,24 +1,47 @@
-# Dependencies
+# ─── Dependencies ────────────────────────────────────────────────────────────
 node_modules/
 
-# Environment variables
+# ─── Environment / Secrets ───────────────────────────────────────────────────
+# Never commit real credentials — copy .env.example and fill in your values
 .env
+.env.local
+.env.*.local
+.env.production
+.env.staging
 
-# Generated files
+# ─── Docker local data volumes ───────────────────────────────────────────────
+# Prevent accidentally committing Postgres or MinIO volume data
+data/
+postgres_data/
+minio_data/
+
+# ─── Generated / build output ────────────────────────────────────────────────
 generated-server.ts
+dist/
+build/
 
-# Test coverage
+# ─── Test output ─────────────────────────────────────────────────────────────
 coverage/
 
-# Build output
-dist/
+# ─── Logs ────────────────────────────────────────────────────────────────────
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# VS Code settings
+# ─── Scratch / one-off scripts ───────────────────────────────────────────────
+test-db.js
+
+# ─── Editor settings ─────────────────────────────────────────────────────────
 .vscode/
+.idea/
+*.swp
+*.swo
 
-# OS files
+# ─── OS files ────────────────────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
+
 
 *.log
 

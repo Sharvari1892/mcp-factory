@@ -1,34 +1,40 @@
 const express = require("express");
 const { v4: uuidv4 } = require("uuid");
-const { z } = require("zod");
+const multer = require("multer");
 
 const pool = require("../db");
-
-const authMiddleware =
-    require("../middleware/auth.middleware");
-
-const validateMiddleware =
-    require("../middleware/validate.middleware");
+const authMiddleware = require("../middleware/auth.middleware");
+const { uploadFile } = require("../services/storage.service");
 
 const router = express.Router();
-
-const specSchema = z.object({
-    name: z.string().min(1),
-    specContent: z.string().min(1)
-});
+const upload = multer({ storage: multer.memoryStorage() });
 
 router.post(
     "/",
     authMiddleware,
-    validateMiddleware(specSchema),
+    upload.single("spec"),
 
     async (req, res, next) => {
-
         try {
+            if (!req.file) {
+                const err = new Error("Validation failed: spec file is required");
+                err.statusCode = 400;
+                return next(err);
+            }
 
-            const { name, specContent } = req.body;
+            const { name } = req.body;
+            if (!name || typeof name !== "string" || name.trim() === "") {
+                const err = new Error("Validation failed: name is required");
+                err.statusCode = 400;
+                return next(err);
+            }
 
             const specId = uuidv4();
+            const storageKey = `${req.userId}/${specId}.yaml`;
+            const specContent = req.file.buffer.toString("utf8");
+
+            // Upload spec file buffer to MinIO bucket specs
+            await uploadFile("specs", storageKey, req.file.buffer, "application/x-yaml");
 
             await pool.query(
                 `
@@ -49,18 +55,16 @@ router.post(
             );
 
             res.status(201).json({
-                specId
+                specId,
+                storageKey
             });
 
         }
         catch (err) {
-
-            const serverError = new Error("Internal server error");
-            serverError.statusCode = 500;
+            const serverError = new Error(err.message || "Internal server error");
+            serverError.statusCode = err.statusCode || 500;
             return next(serverError);
-
         }
-
     }
 );
 
