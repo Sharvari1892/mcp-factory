@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@theme {
+  --color-brand-50: #f5f7fa;
+  --color-brand-100: #eaeef4;
+  --color-brand-200: #d5dde8;
+  --color-brand-300: #b4c3d6;
+  --color-brand-400: #8ca3be;
+  --color-brand-500: #6983a5;
+  --color-brand-600: #526a8d;
+  --color-brand-700: #435674;
+  --color-brand-800: #39475f;
+  --color-brand-950: #0f172a;
+}
+
+@utility glass {
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+@utility glass-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  &:hover {
+    background: rgba(15, 23, 42, 0.8);
+    border-color: rgba(99, 102, 241, 0.3);
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+    transform: translateY(-2px);
+  }
+}
+
+html, body {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  background-color: #020617; /* bg-slate-950 equivalent */
+  color: #f8fafc; /* text-slate-50 equivalent */
+  min-height: 100vh;
+}
+
+code {
+  font-family: 'JetBrains Mono', monospace;
+}
