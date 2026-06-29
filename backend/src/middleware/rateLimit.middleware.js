@@ -12,6 +12,12 @@ const { redisConnection } = require('../services/queue.service');
  */
 async function rateLimitMiddleware(req, res, next) {
   try {
+    const requestPath = req.originalUrl || req.path || '';
+
+    if (req.method === 'OPTIONS' || requestPath.startsWith('/auth/')) {
+      return next();
+    }
+
     const ip = req.ip || 'unknown';
     const key = `rate_limit:${ip}`;
     const now = Date.now();

@@ -8,7 +8,7 @@
     "dev": "nodemon server.js",
     "worker": "node src/worker.js",
     "mcp": "tsx generated-server.ts",
-    "test": "vitest"
+    "test": "vitest run"
   },
   "keywords": [],
   "author": "",

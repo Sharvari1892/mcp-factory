@@ -51,7 +51,10 @@ describe('rateLimitMiddleware', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     req = {
-      ip: '127.0.0.1'
+      ip: '127.0.0.1',
+      method: 'GET',
+      path: '/servers',
+      originalUrl: '/servers'
     };
     res = {
       status: vi.fn().mockReturnThis(),
@@ -68,7 +71,7 @@ describe('rateLimitMiddleware', () => {
 
     await rateLimitMiddleware(req, res, next);
 
-    expect(mockRedis.zadd).toHaveBeenCalledWith('rate_limit:127.0.0.1', expect.any(Number), expect.any(Number));
+    expect(mockRedis.zadd).toHaveBeenCalledWith('rate_limit:127.0.0.1', expect.any(Number), expect.any(String));
     expect(mockRedis.zremrangebyscore).toHaveBeenCalledWith('rate_limit:127.0.0.1', '-inf', expect.any(Number));
     expect(mockRedis.zcount).toHaveBeenCalledWith('rate_limit:127.0.0.1', expect.any(Number), expect.any(Number));
     expect(mockRedis.expire).toHaveBeenCalledWith('rate_limit:127.0.0.1', 70);
@@ -95,6 +98,18 @@ describe('rateLimitMiddleware', () => {
     await rateLimitMiddleware(req, res, next);
 
     expect(next).toHaveBeenCalled();
+    expect(res.status).not.toHaveBeenCalled();
+  });
+
+  test('should skip auth routes and preflight requests', async () => {
+    req.method = 'OPTIONS';
+    req.path = '/auth/register';
+    req.originalUrl = '/auth/register';
+
+    await rateLimitMiddleware(req, res, next);
+
+    expect(next).toHaveBeenCalled();
+    expect(mockRedis.zadd).not.toHaveBeenCalled();
     expect(res.status).not.toHaveBeenCalled();
   });
 });

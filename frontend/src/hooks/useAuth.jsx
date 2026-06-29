@@ -1,11 +1,11 @@
 import React, { createContext, useContext, useState, useRef, useEffect } from 'react';
-import { setAccessToken } from '../api/axios';
+import { hydrateAccessToken, setAccessToken } from '../api/axios';
 import * as authApi from '../api/auth.api';
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-    const accessTokenRef = useRef(null);
+    const accessTokenRef = useRef(hydrateAccessToken());
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -67,6 +67,12 @@ export function AuthProvider({ children }) {
     // Auto-refresh token on component mount
     useEffect(() => {
         async function silentRefresh() {
+            if (accessTokenRef.current) {
+                handleAuthSuccess(accessTokenRef.current);
+                setLoading(false);
+                return;
+            }
+
             try {
                 const data = await authApi.refresh();
                 handleAuthSuccess(data.accessToken);

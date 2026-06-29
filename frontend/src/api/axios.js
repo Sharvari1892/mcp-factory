@@ -1,13 +1,34 @@
 import axios from 'axios';
 
 let accessToken = null;
+const ACCESS_TOKEN_STORAGE_KEY = 'mcp_factory_access_token';
 
 export function setAccessToken(token) {
     accessToken = token;
+
+    if (token) {
+        localStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, token);
+    } else {
+        localStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
+    }
 }
 
 export function getAccessToken() {
     return accessToken;
+}
+
+export function getStoredAccessToken() {
+    return localStorage.getItem(ACCESS_TOKEN_STORAGE_KEY);
+}
+
+export function hydrateAccessToken() {
+    const storedToken = getStoredAccessToken();
+
+    if (storedToken) {
+        accessToken = storedToken;
+    }
+
+    return storedToken;
 }
 
 const api = axios.create({
@@ -27,7 +48,13 @@ api.interceptors.request.use(config => {
 api.interceptors.response.use(
     response => response,  // success — pass through
     async error => {
-        const original = error.config;
+        const original = error.config || {};
+        const requestUrl = original.url || '';
+
+        // Never try to refresh when the failing request is itself part of auth.
+        if (requestUrl.startsWith('/auth/')) {
+            return Promise.reject(error);
+        }
 
         // If 401 and not already retrying — attempt refresh
         if (error.response?.status === 401 && !original._retry) {

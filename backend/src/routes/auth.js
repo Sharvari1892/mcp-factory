@@ -169,46 +169,34 @@ catch (err) {
 });
 
 
-router.post('/refresh', async (req, res, next) => {
+router.post('/refresh', async (req, res) => {
+    try {
+        const refreshToken = req.cookies.refreshToken;
 
-try {
+        if (!refreshToken) {
+            return res.status(401).json({
+                error: 'Refresh token missing'
+            });
+        }
 
-    const refreshToken =
-        req.cookies.refreshToken;
+        const payload = verifyRefreshToken(refreshToken);
 
-    if (!refreshToken) {
-        const err = new Error('Refresh token missing');
-        err.statusCode = 401;
-        return next(err);
+        if (!payload) {
+            return res.status(401).json({
+                error: 'Invalid refresh token'
+            });
+        }
+
+        const accessToken = signAccessToken(payload.userId);
+
+        return res.json({
+            accessToken
+        });
     }
-
-    const payload =
-        verifyRefreshToken(refreshToken);
-
-    if (!payload) {
-        const err = new Error('Invalid refresh token');
-        err.statusCode = 401;
-        return next(err);
+    catch {
+        return res.status(401).json({
+            error: 'Invalid refresh token'
+        });
     }
-
-    const accessToken =
-        signAccessToken(payload.userId);
-
-    res.json({
-        accessToken
-    });
-
-}
-catch (err) {
-    const tokenError = new Error('Invalid refresh token');
-    tokenError.statusCode = 401;
-    return next(tokenError);
-
-}
-
-
 });
-
-
-
-module.exports = router;
+            error: 'Invalid refresh token'

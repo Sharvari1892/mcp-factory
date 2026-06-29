@@ -1,9 +1,12 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate, Link, useParams } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Dashboard from './pages/Dashboard';
+import Generate from './pages/Generate';
+import ServerDetail from "./pages/ServerDetail";
 
 // Main Layout for Protected Routes
 function AppLayout({ children }) {
@@ -54,72 +57,7 @@ function AppLayout({ children }) {
     );
 }
 
-// Placeholder Pages
-function Dashboard() {
-    return (
-        <div className="space-y-6">
-            <div>
-                <h1 className="text-3xl font-extrabold text-white tracking-tight">Dashboard</h1>
-                <p className="text-slate-400 mt-2">Manage your generated Model Context Protocol servers.</p>
-            </div>
-            <div className="border border-dashed border-slate-800 rounded-2xl p-12 text-center bg-slate-900/10">
-                <svg className="w-12 h-12 text-slate-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                </svg>
-                <h3 className="text-lg font-semibold text-white">No servers created yet</h3>
-                <p className="text-slate-400 text-sm mt-1 max-w-md mx-auto">
-                    Create custom servers by uploading openapi specifications and let the worker generate execution tools.
-                </p>
-                <div className="mt-6">
-                    <Link
-                        to="/generate"
-                        className="inline-flex items-center justify-center px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl transition shadow-lg hover:shadow-indigo-500/20"
-                    >
-                        Generate Server
-                    </Link>
-                </div>
-            </div>
-        </div>
-    );
-}
 
-function Generate() {
-    return (
-        <div className="space-y-6">
-            <div>
-                <h1 className="text-3xl font-extrabold text-white tracking-tight">Generate Server</h1>
-                <p className="text-slate-400 mt-2">Bootstrap custom MCP servers in seconds.</p>
-            </div>
-            <div className="glass rounded-2xl p-8 border border-slate-800">
-                <h3 className="text-lg font-semibold text-white mb-4">Under Construction</h3>
-                <p className="text-slate-400 text-sm">
-                    This module is currently pending integration. Check back shortly!
-                </p>
-            </div>
-        </div>
-    );
-}
-
-function ServerDetail() {
-    const { id } = useParams();
-    return (
-        <div className="space-y-6">
-            <div>
-                <Link to="/dashboard" className="text-sm font-semibold text-indigo-400 hover:text-indigo-300 flex items-center space-x-1">
-                    <span>&larr; Back to Dashboard</span>
-                </Link>
-                <h1 className="text-3xl font-extrabold text-white tracking-tight mt-4">Server Details</h1>
-                <p className="text-slate-400 mt-2">Server ID: <code className="text-indigo-400 bg-indigo-950/30 px-2 py-1 rounded-md text-xs">{id}</code></p>
-            </div>
-            <div className="glass rounded-2xl p-8 border border-slate-800">
-                <h3 className="text-lg font-semibold text-white mb-4">Log Streaming & Downloads</h3>
-                <p className="text-slate-400 text-sm">
-                    Detailed statistics and log downloads for this server will appear here.
-                </p>
-            </div>
-        </div>
-    );
-}
 
 export function App() {
     return (
@@ -135,9 +73,7 @@ export function App() {
                         path="/dashboard"
                         element={
                             <ProtectedRoute>
-                                <AppLayout>
-                                    <Dashboard />
-                                </AppLayout>
+                                <Dashboard />
                             </ProtectedRoute>
                         }
                     />
